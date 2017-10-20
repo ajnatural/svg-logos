@@ -1,0 +1,18 @@
+{
+  "name": "svg-logos",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "node-fetch": "^1.7.3",
+    "pretty-data": "^0.40.0",
+    "svgdom": "0.0.15",
+    "svgjs": "^2.6.2",
+    "the-noun-project": "^2.0.1"
+  }
+}

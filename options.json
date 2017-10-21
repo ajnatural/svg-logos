@@ -1,0 +1,20 @@
+{
+    "arrangement": [
+        "icon-right",
+        "icon-left",
+        "icon-top"
+    ],
+    "_font": [
+
+    ],
+    "_style": [
+        "normal",
+        "italic"
+    ],
+    "_weight": [
+        "normal",
+        "bold",
+        "bolder",
+        "lighter"
+    ]
+}

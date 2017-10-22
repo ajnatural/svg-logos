@@ -4,44 +4,72 @@ const window   = require('svgdom')
 const SVG      = require('svgjs')(window)
 const document = window.document
 const pd = require('pretty-data').pd
+const options = require('./options.json')
 
 const draw = SVG(document.documentElement)
 const url = 'https://raw.githubusercontent.com/ajnatural/svg-logos/master/sample.svg';
+
+const LONG = 1200
+const MEDIUM = 600
+const SHORT = 300
+const BUFFER = 15
 
 const  buildLogo = (params) => {
   fetch(params.icon).then(res => {
     return res.text()
   }).then(body => {
     const icon = buildIcon(body);
-    const heading = buildText(params.heading, params.heading_font, params.heading_size, params.heading_weight, params.heading_style)
-    const slogan = buildText(params.slogan, params.slogan_font, params.slogan_size, params.slogan_weight, params.slogan_style)
+    const heading = buildText(params.heading, params.heading_font, params.heading_weight, params.heading_style)
+    const slogan = buildText(params.slogan, params.slogan_font, params.slogan_weight, params.slogan_style)
 
     switch (params.arrangement) {
       case 'icon-left':
-        draw.attr('viewBox', '0 0 600 300')
-        draw.size(600, 300)
+        draw.attr('viewBox', `0 0 ${LONG} ${SHORT}`)
+        draw.size(LONG, SHORT)
 
-        icon.size(null, 300)
-        heading.move(icon.width() + 10, 10)
-        slogan.move(icon.width() + 10, heading.attr('font-size') + 10)
+        icon.size(null, SHORT)
+        icon.attr('viewBox', '0 0 100 100')
+
+        scaleText(heading, LONG - icon.width() - BUFFER, SHORT / 2)
+        scaleText(slogan, LONG - icon.width() - BUFFER, heading.bbox().height * 0.6)
+
+        heading.move(icon.width() + BUFFER, BUFFER)
+        slogan.move(icon.width() + BUFFER, heading.bbox().height)
+
         break;
       case 'icon-right':
-        draw.attr('viewBox', '0 0 600 300')
-        draw.size(600, 300)
+        draw.attr('viewBox', `0 0 ${LONG} ${SHORT}`)
+        draw.size(LONG, SHORT)
 
-        icon.size(null, 300)
-        icon.move(600 - icon.width(), 0)
-        heading.move(600 - icon.width() - heading.bbox().width, 10)
-        slogan.move(600 - icon.width() - slogan.bbox().width, heading.attr('font-size') + 10)
+        icon.size(null, SHORT)
+        icon.attr('viewBox', '0 0 100 100')
+        icon.move(LONG - icon.width(), 0)
+
+        scaleText(heading, LONG - icon.width() - BUFFER, SHORT / 2)
+        scaleText(slogan, LONG - icon.width() - BUFFER, heading.bbox().height * 0.6)
+
+        heading.move(LONG - icon.width() - heading.bbox().width, BUFFER)
+        slogan.move(LONG - icon.width() - slogan.bbox().width, heading.bbox().height)
+
         break;
       case 'icon-top':
-        draw.attr('viewBox', '0 0 600 600')
-        draw.size(600, 600)
+        draw.attr('viewBox', `0 0 ${MEDIUM} ${MEDIUM}`)
+        draw.size(MEDIUM, MEDIUM)
 
-        icon.size(null, 300)
-        icon.center(300, 300)
-        heading.center(300, icon.height() + 10)
-        slogan.center(300, icon.height() + heading.attr('font-size') + 10)
+        icon.size(MEDIUM / 2, null)
+        icon.attr('viewBox', '0 0 100 100')
+        icon.center(MEDIUM / 2, null)
+
+        scaleText(heading, MEDIUM)
+        scaleText(slogan, MEDIUM)
+
+
+        heading.move(MEDIUM / 2, icon.height())
+        heading.font('anchor', 'middle')
+
+        slogan.move(MEDIUM / 2, icon.height() + heading.bbox().height)
+        slogan.font('anchor', 'middle')
+
         break;
     }
 
@@ -57,15 +85,26 @@ const buildIcon = (icon) => {
   return el
 }
 
-const buildText = (text, font, size, weight, style) => {
+const buildText = (text, font, weight, style) => {
   const el = draw.plain(text)
   el.font({
     family: font,
-    size: size,
     weight: weight,
+    size: 150,
     style: style
   })
   return el
+}
+
+/**
+ * Scales a text element down to limit width by changing font size
+ */
+const scaleText = (el, widthLimit, heightLimit) => {
+  var i = 200
+  do {
+    el.font({'size': i})
+    i--;
+  } while (el.bbox().width >= widthLimit * 0.9 || el.bbox().height >= heightLimit * 0.9)
 }
 
 const saveLogo = () => {
@@ -77,17 +116,33 @@ const saveLogo = () => {
   });
 }
 
-buildLogo({
+params = [
+  "arrangement",
+  "icon_color",
+  "heading_font",
+  "heading_style",
+  "heading_weight",
+  "heading_color",
+  "slogan_font",
+  "slogan_style",
+  "slogan_weight",
+  "slogan_color"
+]
+
+custom_params = {}
+params.forEach(p => {
+  Object.keys(options).forEach(k => {
+    if (p.includes(k)) {
+      // Pick a random value for the parameters we have options for
+      custom_params[p] = options[k][Math.floor(Math.random()*options[k].length)]
+    }
+  });
+});
+
+custom_params = Object.assign(custom_params, {
   icon: url,
   heading: 'Menith',
-  slogan: 'Design and Development',
-  arrangement: 'icon-right',
-  heading_font: 'Helvetica',
-  heading_size: '32',
-  heading_style: 'italic',
-  heading_weight: '100',
-  slogan_font: 'Verdana',
-  slogan_size: '24',
-  slogan_style: 'oblique',
-  slogan_weight: '300'
-});
+  slogan: 'Design and Development'
+})
+
+buildLogo(custom_params)

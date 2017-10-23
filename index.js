@@ -1,7 +1,7 @@
-const fs = require('fs');
-const fetch = require('node-fetch');
-const window   = require('svgdom')
-const SVG      = require('svgjs')(window)
+const fs = require('fs')
+const fetch = require('node-fetch')
+let window = require('svgdom')
+const SVG = require('svgjs')(window)
 const document = window.document
 const pd = require('pretty-data').pd
 const options = require('./options.json')
@@ -9,7 +9,7 @@ const options = require('./options.json')
 const draw = SVG(document.documentElement)
 const url = 'https://raw.githubusercontent.com/ajnatural/svg-logos/master/sample.svg';
 
-const LONG = 1200
+const LONG = 1000
 const MEDIUM = 600
 const SHORT = 300
 const BUFFER = 15
@@ -31,10 +31,18 @@ const  buildLogo = (params) => {
         icon.attr('viewBox', '0 0 100 100')
 
         scaleText(heading, LONG - icon.width() - BUFFER, SHORT / 2)
-        scaleText(slogan, LONG - icon.width() - BUFFER, heading.bbox().height * 0.6)
+        scaleText(slogan, LONG - icon.width() - BUFFER, heading.rbox().height * 0.6)
 
-        heading.move(icon.width() + BUFFER, BUFFER)
-        slogan.move(icon.width() + BUFFER, heading.bbox().height)
+        var textGroup = draw.group()
+        textGroup.add(heading)
+        textGroup.add(slogan)
+
+        textGroup.attr('text-anchor', 'start')
+        var groupHeight = heading.bbox().height + slogan.bbox().height
+        textGroup.translate(icon.width() + BUFFER, (SHORT - groupHeight * 1.15) / 2)
+
+        heading.y(0)
+        slogan.y(heading.bbox().height * 0.85)
 
         break;
       case 'icon-right':
@@ -46,10 +54,18 @@ const  buildLogo = (params) => {
         icon.move(LONG - icon.width(), 0)
 
         scaleText(heading, LONG - icon.width() - BUFFER, SHORT / 2)
-        scaleText(slogan, LONG - icon.width() - BUFFER, heading.bbox().height * 0.6)
+        scaleText(slogan, LONG - icon.width() - BUFFER, heading.rbox().height * 0.6)
 
-        heading.move(LONG - icon.width() - heading.bbox().width, BUFFER)
-        slogan.move(LONG - icon.width() - slogan.bbox().width, heading.bbox().height)
+        var textGroup = draw.group()
+        textGroup.add(heading)
+        textGroup.add(slogan)
+
+        textGroup.attr('text-anchor', 'end')
+        var groupHeight = heading.bbox().height + slogan.bbox().height
+        textGroup.translate(LONG - icon.width() - BUFFER, (SHORT - groupHeight * 1.15) / 2)
+
+        heading.y(0)
+        slogan.y(heading.bbox().height * 0.85)
 
         break;
       case 'icon-top':
@@ -60,14 +76,13 @@ const  buildLogo = (params) => {
         icon.attr('viewBox', '0 0 100 100')
         icon.center(MEDIUM / 2, null)
 
-        scaleText(heading, MEDIUM)
-        scaleText(slogan, MEDIUM)
+        scaleText(heading, MEDIUM - BUFFER)
+        scaleText(slogan, MEDIUM - BUFFER)
 
-
-        heading.move(MEDIUM / 2, icon.height())
+        heading.move(MEDIUM / 2, icon.height() * 0.85)
         heading.font('anchor', 'middle')
 
-        slogan.move(MEDIUM / 2, icon.height() + heading.bbox().height)
+        slogan.move(MEDIUM / 2, (icon.height() + heading.rbox().height) * 0.85)
         slogan.font('anchor', 'middle')
 
         break;
@@ -104,7 +119,7 @@ const scaleText = (el, widthLimit, heightLimit) => {
   do {
     el.font({'size': i})
     i--;
-  } while (el.bbox().width >= widthLimit * 0.9 || el.bbox().height >= heightLimit * 0.9)
+  } while (el.rbox().width >= widthLimit * 0.9 || el.rbox().height >= heightLimit * 0.9)
 }
 
 const saveLogo = () => {

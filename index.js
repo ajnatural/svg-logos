@@ -41,6 +41,7 @@ const fetchIcon = (params, cb) => {
 
 const  buildLogo = (params) => {
   fetchIcon(params, body => {
+    console.log(body)
     const icon = buildIcon(body);
     const heading = buildText(params.heading, params.heading_font, params.heading_weight, params.heading_style)
     const slogan = buildText(params.slogan, params.slogan_font, params.slogan_weight, params.slogan_style)
@@ -140,6 +141,7 @@ const buildIcon = (icon) => {
     return icon
   }
 
+  console.log(icon)
   const el = draw.svg(icon).last()
   el.attr('viewBox', null)
   return el

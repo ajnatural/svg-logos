@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" version="1.1" style="shape-rendering:geometricPrecision;text-rendering:geometricPrecision;image-rendering:optimizeQuality;" viewBox="0 0 324 299" x="0px" y="0px" fill-rule="evenodd" clip-rule="evenodd"><defs><style type="text/css">
+   
+    .fil1 {fill:black}
+        .fil0 {fill:black}
+            .fil2 {fill:black;fill-rule:nonzero}
+               
+              </style></defs><g><path class="fil0" d="M218 65c29,-31 63,-32 106,26 -28,6 -61,35 -111,-18 21,-2 36,-9 71,5 -18,-12 -40,-20 -66,-13z"></path><circle class="fil1" transform="matrix(-1.44957 0.558587 0.558587 1.44957 210.6 143.424)" r="4"></circle><circle class="fil1" transform="matrix(-1.44957 0.558587 0.558587 1.44957 210.6 143.424)" r="4"></circle><path class="fil2" d="M200 240c-80,97 -264,68 -177,-42 5,-7 11,-49 15,-62 23,-85 107,-100 160,-69 11,-16 18,-39 12,-59 -2,-8 15,-11 17,-4 7,24 -5,49 -19,70 40,30 56,91 -8,166zm-8 -7c131,-158 -104,-238 -143,-94 -5,16 -9,56 -17,66 -78,98 91,111 160,28z"></path><path class="fil2" d="M202 162c2,-7 13,-4 11,3 -7,27 -21,49 -44,65 -6,4 -12,-5 -6,-10 20,-14 33,-34 39,-58z"></path></g></svg>

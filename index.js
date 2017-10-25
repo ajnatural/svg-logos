@@ -5,22 +5,62 @@ const SVG = require('svgjs')(window)
 const document = window.document
 const pd = require('pretty-data').pd
 const options = require('./options.json')
+const ColorScheme = require('color-scheme')
+const NounProject = require('the-noun-project')
 
 const draw = SVG(document.documentElement)
-const url = 'https://raw.githubusercontent.com/ajnatural/svg-logos/master/sample.svg';
+const base_url = 'https://raw.githubusercontent.com/ajnatural/svg-logos/master/samples/';
 
 const LONG = 1000
 const MEDIUM = 600
 const SHORT = 300
 const BUFFER = 15
 
+nounProject = new NounProject({
+    key: 'ec42b2655df04cb7bf3d1ef7aa2129c4',
+    secret: '775826a930b24266b7a897f13b136c69'
+});
+
+const fetchIcon = (params, cb) => {
+  switch (params.icon) {
+    case 'text-only':
+      break;
+    case 'font':
+      cb(
+        buildFontIcon(params.heading.charAt(0), params.icon_font, params.icon_font_weight, params.icon_font_style)
+      )
+      break;
+    default:
+      fetch(base_url + params.icon_file).then(res => {
+        return res.text()
+      }).then(body => cb(body))
+
+      break;
+  }
+}
+
 const  buildLogo = (params) => {
-  fetch(params.icon).then(res => {
-    return res.text()
-  }).then(body => {
+  fetchIcon(params, body => {
     const icon = buildIcon(body);
     const heading = buildText(params.heading, params.heading_font, params.heading_weight, params.heading_style)
     const slogan = buildText(params.slogan, params.slogan_font, params.slogan_weight, params.slogan_style)
+
+
+    const textGroup = draw.group()
+    textGroup.add(heading)
+    textGroup.add(slogan)
+
+    var groupHeight = heading.bbox().height + slogan.bbox().height
+    var groupHeightFudge = 1.15
+    if (params.slogan == '') {
+      groupHeight = heading.bbox().height
+      groupHeightFudge = 0.8
+    }
+
+    const colors = getColors(params.text_color_hue, params.text_color_variation)
+    heading.attr('fill', '#' + colors[0])
+    slogan.attr('fill', '#' + colors[1])
+    icon.attr('fill', '#' + colors[3])
 
     switch (params.arrangement) {
       case 'icon-left':
@@ -33,13 +73,8 @@ const  buildLogo = (params) => {
         scaleText(heading, LONG - icon.width() - BUFFER, SHORT / 2)
         scaleText(slogan, LONG - icon.width() - BUFFER, heading.rbox().height * 0.6)
 
-        var textGroup = draw.group()
-        textGroup.add(heading)
-        textGroup.add(slogan)
-
         textGroup.attr('text-anchor', 'start')
-        var groupHeight = heading.bbox().height + slogan.bbox().height
-        textGroup.translate(icon.width() + BUFFER, (SHORT - groupHeight * 1.15) / 2)
+        textGroup.translate(icon.width() + BUFFER, (SHORT - groupHeight * groupHeightFudge) / 2)
 
         heading.y(0)
         slogan.y(heading.bbox().height * 0.85)
@@ -56,13 +91,8 @@ const  buildLogo = (params) => {
         scaleText(heading, LONG - icon.width() - BUFFER, SHORT / 2)
         scaleText(slogan, LONG - icon.width() - BUFFER, heading.rbox().height * 0.6)
 
-        var textGroup = draw.group()
-        textGroup.add(heading)
-        textGroup.add(slogan)
-
         textGroup.attr('text-anchor', 'end')
-        var groupHeight = heading.bbox().height + slogan.bbox().height
-        textGroup.translate(LONG - icon.width() - BUFFER, (SHORT - groupHeight * 1.15) / 2)
+        textGroup.translate(LONG - icon.width() - BUFFER, (SHORT - groupHeight * groupHeightFudge) / 2)
 
         heading.y(0)
         slogan.y(heading.bbox().height * 0.85)
@@ -89,13 +119,28 @@ const  buildLogo = (params) => {
     }
 
     saveLogo();
-  });
+  })
+}
+
+const buildFontIcon = (text, font, weight, style) => {
+  const nested = draw.nested()
+  const el = nested.plain(text)
+  el.font({
+    family: font,
+    weight: weight,
+    style: style,
+    size: 100
+  })
+  nested.attr('style', '')
+  return nested
 }
 
 const buildIcon = (icon) => {
-  icon = icon.replace('<svg', '<svg id="custom_logo" ')
-  draw.svg(icon)
-  const el = SVG.get('custom_logo')
+  if (typeof icon == 'object') {
+    return icon
+  }
+
+  const el = draw.svg(icon).last()
   el.attr('viewBox', null)
   return el
 }
@@ -105,7 +150,6 @@ const buildText = (text, font, weight, style) => {
   el.font({
     family: font,
     weight: weight,
-    size: 150,
     style: style
   })
   return el
@@ -131,17 +175,29 @@ const saveLogo = () => {
   });
 }
 
+const getColors = (hue, variation) => {
+  const colorScheme = new ColorScheme
+  return colorScheme
+        .from_hue(hue)
+        .scheme('mono')
+        .variation(variation).colors();
+}
+
 params = [
   "arrangement",
   "icon_color",
   "heading_font",
   "heading_style",
   "heading_weight",
-  "heading_color",
   "slogan_font",
   "slogan_style",
   "slogan_weight",
-  "slogan_color"
+  "text_color_variation",
+  "text_color_hue",
+  "icon_font",
+  "icon_font_weight",
+  "icon_font_style",
+  "icon_file"
 ]
 
 custom_params = {}
@@ -155,9 +211,8 @@ params.forEach(p => {
 });
 
 custom_params = Object.assign(custom_params, {
-  icon: url,
   heading: 'Menith',
-  slogan: 'Design and Development'
+  slogan: ''
 })
 
 buildLogo(custom_params)

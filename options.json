@@ -1,12 +1,19 @@
 {
+    "icon": [
+        "text-only",
+        "font"
+    ],
+    "icon_file": [
+        "boat.svg",
+        "fox.svg",
+        "head.svg",
+        "mango.svg",
+        "snus.svg"
+    ],
     "arrangement": [
         "icon-right",
         "icon-left",
         "icon-top"
-    ],
-    "icon" : [
-        "yes",
-        "no"
     ],
     "_font": [
         "Helvetica",
@@ -38,9 +45,35 @@
         "bolder",
         "lighter"
     ],
-    "_color": {
-        "black": [
-            "#cfcfcf"
-        ]
-    }
+    "_color_variation": [
+        "default",
+        "pastel",
+        "soft",
+        "light",
+        "hard",
+        "pale"
+    ],
+    "color_hue": [
+        40,
+        80,
+        120,
+        160,
+        200,
+        240,
+        280,
+        320,
+        360
+    ],
+    "base_colors": [
+        "#111111",
+        "#0066d0",
+        "#04adad",
+        "#12ab0f",
+        "#541eb5",
+        "#c23bab",
+        "#ea1b1b",
+        "#ea6100",
+        "#eec617"
+
+    ]
 }
